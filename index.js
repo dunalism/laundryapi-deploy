@@ -218,6 +218,8 @@ const createUser = async (req, res) => {
   });
 };
 
+const secret = process.env.JWT_SECRET || "secret";
+
 //LOGIN
 const loginUser = (req, res) => {
   const { username, password } = req.body;
@@ -235,7 +237,6 @@ const loginUser = (req, res) => {
       const passwordIsValid = compareSync(password, user.password);
 
       if (passwordIsValid) {
-        const secret = process.env.JWT_SECRET || "secret";
         const token = sign({ id: user.id, role: user.role }, secret, {
           expiresIn: 86400,
         });
@@ -419,7 +420,7 @@ const verifyToken = (req, res, next) => {
   const token = authHeader.split(" ")[1]; // Pisahkan "Bearer" dan token
 
   // Verifikasi token
-  pkg2.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+  pkg2.verify(token, secret, (err, decoded) => {
     if (err)
       return res.status(401).json({ auth: false, message: "Invalid token" });
 
@@ -1083,7 +1084,7 @@ const cors = require("cors");
 
 const corsOrigin = process.env.ORIGIN || "*";
 
-app.use(cors({ origin: process.env.ORIGIN }));
+app.use(cors({ origin: corsOrigin }));
 
 // Middleware untuk parsing JSON
 app.use(express.json());
