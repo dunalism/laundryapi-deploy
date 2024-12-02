@@ -235,11 +235,10 @@ const loginUser = (req, res) => {
       const passwordIsValid = compareSync(password, user.password);
 
       if (passwordIsValid) {
-        const token = sign(
-          { id: user.id, role: user.role },
-          process.env.JWT_SECRET,
-          { expiresIn: 86400 }
-        );
+        const secret = process.env.JWT_SECRET || "secret";
+        const token = sign({ id: user.id, role: user.role }, secret, {
+          expiresIn: 86400,
+        });
         res.status(200).json({
           auth: true,
           token: token,
@@ -1081,6 +1080,8 @@ const HOST = process.env.DB_HOST || "127.0.0.1";
 const PORT = process.env.PORT || 5000;
 
 const cors = require("cors");
+
+const corsOrigin = process.env.ORIGIN || "*";
 
 app.use(cors({ origin: process.env.ORIGIN }));
 
